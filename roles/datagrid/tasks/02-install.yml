@@ -1,0 +1,47 @@
+---
+- name: Clean installation directory
+  file:
+    path: "{{ install_dir }}/"
+    state: absent
+
+- name: Create auxiliary directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ service.user }}"
+    group: "{{ service.group }}"
+  loop:
+    - "{{ install_dir }}"
+
+- import_tasks: install/fetch_binaries.yml
+  when: datagrid_package_url is defined
+
+- import_tasks: install/copy_binaries.yml
+  when: datagrid_package_path is defined
+
+- name: Find the base directory
+  find:
+    paths: "{{ install_dir }}"
+    recurse: no
+    file_type: directory
+  register: install
+
+- name: Compute the installation directory
+  set_fact:
+    home: "{{ install.files[0].path }}"
+
+- name: Apply patch
+  shell:
+    cmd: "{{ home }}/bin/cli.sh --command='patch apply {{ install_dir }}/{{ patch.name }}'"
+  become_user: "{{ service.user }}"
+  loop: "{{ datagrid_patches | default([]) }}"
+  loop_control:
+    loop_var: patch
+
+- name: Delete patch file
+  file:
+    path: "{{ install_dir }}/{{ patch.name }}"
+    state: absent
+  loop: "{{ datagrid_patches | default([]) }}"
+  loop_control:
+    loop_var: patch

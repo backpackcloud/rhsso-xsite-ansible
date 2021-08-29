@@ -1,0 +1,18 @@
+unit:
+  name: datagrid
+  description: Red Hat Data Grid
+
+console_users:
+  admin: redhat-123
+  developer: developer
+
+service:
+  user: "{{ unit.name }}"
+  group: "{{ unit.name }}"
+
+install_dir: "/opt/{{ unit.name }}"
+
+ports:
+  - 11222/tcp  # cache endpoint
+  - 7800/tcp   # site clustering
+  - 7801/tcp   # cross site TCP

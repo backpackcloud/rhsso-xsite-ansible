@@ -1,0 +1,20 @@
+---
+- include: 00-prechecks.yml
+  tags: always
+
+- include: 01-system.yml
+  tags: system
+
+- include: 02-install.yml
+  tags: install
+
+- include: 03-configure.yml
+  tags: configure
+
+- name: Start instance
+  service:
+    name: "{{ unit.name }}"
+    enabled: true
+    state: started
+    daemon_reload: yes
+  tags: always

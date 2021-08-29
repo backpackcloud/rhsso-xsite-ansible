@@ -1,0 +1,68 @@
+---
+- name: Clean installation directory
+  file:
+    path: "{{ install_dir }}/"
+    state: absent
+
+- name: Create auxiliary directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ service.user }}"
+    group: "{{ service.group }}"
+  loop:
+    - "{{ install_dir }}"
+
+- import_tasks: install/fetch_binaries.yml
+  when: rhsso_package_url is defined
+
+- import_tasks: install/copy_binaries.yml
+  when: rhsso_package_path is defined
+
+- name: Find the base directory
+  find:
+    paths: "{{ install_dir }}"
+    recurse: no
+    file_type: directory
+  register: install
+
+- name: Compute the installation directory
+  set_fact:
+    home: "{{ install.files[0].path }}"
+
+# https://access.redhat.com/solutions/4243861
+- name: Fix .installation directory
+  file:
+    path: "{{ home }}/.installation"
+    state: directory
+    mode: 0755
+  tags:
+    - fix
+
+- name: Apply patch
+  shell:
+    cmd: "{{ home }}/bin/jboss-cli.sh --command='patch apply {{ install_dir }}/{{ patch.name }}'"
+  become_user: "{{ service.user }}"
+  loop: "{{ rhsso_patches | default([]) }}"
+  loop_control:
+    loop_var: patch
+
+- name: Delete patch file
+  file:
+    path: "{{ install_dir }}/{{ patch.name }}"
+    state: absent
+  loop: "{{ rhsso_patches | default([]) }}"
+  loop_control:
+    loop_var: patch
+
+
+# https://access.redhat.com/solutions/4303601
+- name: Fix keycloak user script for Java 11
+  copy:
+    src: files/add-user-keycloak.sh
+    mode: 0744
+    dest: "{{ home }}/bin/add-user-keycloak.sh"
+    owner: "{{ service.user }}"
+    group: "{{ service.group }}"
+  tags:
+    - fix

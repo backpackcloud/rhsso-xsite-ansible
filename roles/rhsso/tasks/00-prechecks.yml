@@ -1,0 +1,40 @@
+---
+- name: Compute network parameters
+  set_fact:
+    rhsso_network:
+      bind_address: "{{ bind_address | default(ansible_ssh_host) }}"
+      jgroups_bind_address: "{{ jgroups_bind_address | default(ansible_ssh_host) }}"
+      nodename: "{{ rhsso_nodename | default(inventory_hostname) }}"
+
+- name: Initialize site hosts
+  set_fact:
+    rhsso_site_nodes: []
+    rhsso_nodes: []
+
+- name: Compute site hosts
+  set_fact:
+    rhsso_site_nodes: "{{ rhsso_site_nodes + [ hostvars[item].rhsso_network.nodename ]  }}"
+  when: "hostvars[item].site == site"
+  loop: "{{ groups['rhsso'] }}"
+
+- name: Compute hosts
+  set_fact:
+    rhsso_nodes: "{{ rhsso_nodes + [ hostvars[item].rhsso_network.nodename ] }}"
+  loop: "{{ groups['rhsso'] }}"
+
+- name: Compute default cache variables
+  set_fact:
+    min_cache_owners: "{{ [3, rhsso_site_nodes | length] | min  }}"
+
+- name: Check if the unit file is present
+  stat:
+    path: "/etc/systemd/system/{{ unit.name }}.service"
+  register: unit_file
+
+# In case of rerun, make sure the services are stopped, so we don't create a mess
+- name: Ensure service is stopped
+  service:
+    name: "{{ unit.name }}"
+    enabled: no
+    state: stopped
+  when: unit_file.stat.exists

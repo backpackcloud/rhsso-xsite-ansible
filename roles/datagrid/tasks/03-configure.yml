@@ -1,0 +1,36 @@
+---
+- name: Find the base directory
+  find:
+    paths: "{{ install_dir }}"
+    recurse: no
+    file_type: directory
+  register: install
+  when: install is not defined
+
+- name: Compute the installation directory
+  set_fact:
+    home: "{{ install.files[0].path }}"
+  when: home is not defined
+
+- name: Add management user
+  shell: >
+    {{ home }}/bin/cli.sh user create "{{ item.key }}" -p "{{ item.value }}"
+  become: yes
+  become_user: "{{ service.user }}"
+  loop: "{{ console_users | dict2items }}"
+
+- name: Create configuration file
+  template:
+    src: infinispan.xml.j2
+    dest: "{{ home }}/server/conf/infinispan.xml"
+    mode: 0644
+    owner: "{{ service.user }}"
+    group: "{{ service.group }}"
+
+- name: Create unit file
+  template:
+    src: service.j2
+    dest: "/etc/systemd/system/{{ unit.name }}.service"
+    mode: "0750"
+    owner: "{{ service.user }}"
+    group: "{{ service.group }}"

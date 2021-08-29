@@ -1,0 +1,86 @@
+---
+- name: Find the base directory
+  find:
+    paths: "{{ install_dir }}"
+    recurse: no
+    file_type: directory
+  register: install
+  when: install is not defined
+
+- name: Compute the installation directory
+  set_fact:
+    home: "{{ install.files[0].path }}"
+  when: home is not defined
+
+- name: Create configuration file
+  template:
+    src: instance.xml.j2
+    dest: "{{ home }}/standalone/configuration/standalone-ha.xml"
+    mode: "0644"
+    owner: "{{ service.user }}"
+    group: "{{ service.group }}"
+
+- name: Create run.conf file
+  template:
+    src: run.conf.j2
+    dest: "{{ home }}/bin/standalone.conf"
+    mode: "0644"
+    owner: "{{ service.user }}"
+    group: "{{ service.group }}"
+
+- name: Create custom layer dir
+  file:
+    path: "{{ home }}/modules/system/layers/{{ custom_layer_name }}"
+    state: directory
+    owner: "{{ service.user }}"
+    group: "{{ service.group }}"
+
+- name: Create layers.conf
+  template:
+    src: layers.conf.j2
+    dest: "{{ home }}/modules/layers.conf"
+    owner: "{{ service.user }}"
+    group: "{{ service.group }}"
+
+- name: Configure JDBC Driver
+  include_tasks: jdbc/add_module.yml
+  vars:
+    driver: "{{ item }}"
+  loop: "{{ jdbc_drivers }}"
+
+- name: Add keycloak users
+  shell: >
+    {{ home }}/bin/add-user-keycloak.sh -u "{{ admin.username }}" -p "{{ admin.password }}"
+  become: yes
+  become_user: "{{ service.user }}"
+  ignore_errors: true
+  when: admin is defined
+  tags: user
+
+- name: Copy deployments
+  copy:
+    src: "{{ deployment }}"
+    dest: "{{ home }}/standalone/deployments/"
+    owner: "{{ service.user }}"
+    group: "{{ service.group }}"
+  loop: "{{ rhsso_deployment_paths | default([]) }}"
+  loop_control:
+    loop_var: deployment
+
+- name: Fetch patch file
+  get_url:
+    url: "{{ deployment }}"
+    dest: "{{ home }}/standalone/deployments/"
+    owner: "{{ service.user }}"
+    group: "{{ service.group }}"
+  loop: "{{ rhsso_deployment_urls | default([]) }}"
+  loop_control:
+    loop_var: deployment
+
+- name: Create unit file
+  template:
+    src: service.j2
+    dest: "/etc/systemd/system/{{ unit.name }}.service"
+    mode: "0750"
+    owner: "{{ service.user }}"
+    group: "{{ service.group }}"

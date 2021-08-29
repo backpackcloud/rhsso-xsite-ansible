@@ -1,0 +1,7 @@
+---
+- hosts: rhsso
+  name: Install RH-SSO
+
+  tasks:
+  - import_role:
+      name: rhsso

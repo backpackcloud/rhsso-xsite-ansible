@@ -1,0 +1,30 @@
+---
+- name: Compute {{ driver.name }} module dir
+  set_fact: 
+    module_dir: "{{ home }}/modules/system/layers/{{ custom_layer_name }}/{{ driver.module | regex_replace('\\.', '/') }}/main"
+
+- name: Add {{ driver.name }} driver module dir
+  file:
+    path: "{{ module_dir }}"
+    state: directory
+    owner: "{{ service.user }}"
+    group: "{{ service.group }}"
+
+- name: Add {{ driver.name }} resources
+  copy:
+    src: "files/jdbc/{{ driver.name }}/{{ resource }}"
+    dest: "{{ module_dir }}/{{ resource }}"
+    mode: 0644
+    owner: "{{ service.user }}"
+    group: "{{ service.group }}"
+  loop: "{{ driver.resources }}"
+  loop_control:
+    loop_var: resource
+
+- name: Add {{ driver.name }} driver module xml
+  template:
+    src: module.jdbc.xml.j2
+    dest: "{{ module_dir }}/module.xml"
+    mode: 0644
+    owner: "{{ service.user }}"
+    group: "{{ service.group }}"

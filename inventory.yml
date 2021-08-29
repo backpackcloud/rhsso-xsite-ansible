@@ -1,0 +1,67 @@
+all:
+  vars:
+    ansible_user: root
+    ansible_ssh_private_key_file: ~/.ssh/id_rsa
+
+    datagrid_package_path: .bin/redhat-datagrid-8.2.1-server.zip
+
+    rhsso_package_path: .bin/rh-sso-7.4.0.zip
+    rhsso_patches:
+      - path: .bin/rh-sso-7.4.8-patch.zip
+        name: rh-sso-7.4.8-patch.zip
+
+    rhsso_deployment_paths:
+      - .bin/keycloak-http-forwarder-0.1.0.jar
+
+    rhsso_system_properties:
+      events.http.url: https://elasticsearch.example.com/rhsso/events
+
+  children:
+
+    site_a:
+      vars:
+        site: site_a
+        rhsso_datasource:
+          connection_url: jdbc:mariadb://mariadba.example.com:3306/rhsso
+          username: rhsso
+          password: rhsso
+
+        rhsso_datagrid_connection:
+          host: rhdga1.example.com
+          username: developer
+          password: developer
+
+      hosts:
+        rhssoa1.example.com:
+        rhssoa2.example.com:
+
+        rhdga1.example.com:
+        rhdga2.example.com:
+
+    site_b:
+      vars:
+        site: site_b
+        rhsso_datasource:
+          connection_url: jdbc:mariadb://mariadbb.example.com:3306/rhsso
+          username: rhsso
+          password: rhsso
+
+        rhsso_datagrid_connection:
+          host: rhdgb1.example.com
+          username: developer
+          password: developer
+
+      hosts:
+        rhssob1.example.com:
+        rhssob2.example.com:
+
+        rhdgb1.example.com:
+        rhdgb2.example.com:
+
+    datagrid:
+      hosts:
+        rhdg[a:b][1:2].example.com:
+
+    rhsso:
+      hosts:
+        rhsso[a:b][1:2].example.com:

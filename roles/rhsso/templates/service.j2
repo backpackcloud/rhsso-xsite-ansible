@@ -1,0 +1,12 @@
+[Unit]
+Description={{ unit.description }}
+After=network.target
+
+[Service]
+ExecStart={{ home }}/bin/standalone.sh -c standalone-ha.xml
+Type=simple
+Environment="JBOSS_HOME={{ home }}"
+User={{ service.user }}
+
+[Install]
+WantedBy=multi-user.target

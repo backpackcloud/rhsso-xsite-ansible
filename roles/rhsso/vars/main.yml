@@ -1,0 +1,31 @@
+unit:
+  name: rhsso
+  description: Red Hat Single Sign-On
+
+service:
+  user: "{{ unit.name }}"
+  group: "{{ unit.name }}"
+
+install_dir: "/opt/{{ unit.name }}"
+
+ports:
+  - 8080/tcp
+  - 9990/tcp
+  - 7600/tcp
+  - 8443/tcp
+
+# Default values for JVM
+jvm:
+  heap: 1303m
+  metaspace: 256m
+
+# Custom layer used to add modules
+custom_layer_name: custom
+
+# List of jdbc drivers to load
+jdbc_drivers:
+  - name: mariadb
+    module: org.mariadb.jdbc
+    resources:
+      - mariadb-java-client-2.5.4.jar
+    xa_datasource_class: org.mariadb.jdbc.MariaDbDataSource

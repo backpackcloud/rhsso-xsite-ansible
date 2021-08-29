@@ -1,0 +1,11 @@
+[Unit]
+Description={{ unit.description }}
+After=network.target
+
+[Service]
+ExecStart={{ home }}/bin/server.sh -b {{ datagrid_network.bind_address }} -k {{ datagrid_network.jgroups_bind_address }} -Drelay.site={{ site }}
+Type=simple
+User={{ service.user }}
+
+[Install]
+WantedBy=multi-user.target

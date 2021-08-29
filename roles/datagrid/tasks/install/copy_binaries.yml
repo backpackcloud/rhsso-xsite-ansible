@@ -1,0 +1,17 @@
+---
+- name: Extract package file
+  unarchive:
+    src: "{{ datagrid_package_path }}"
+    dest: "{{ install_dir }}"
+    owner: "{{ service.user }}"
+    group: "{{ service.group }}"
+
+- name: Copy patch file
+  copy:
+    src: "{{ patch.path }}"
+    dest: "{{ install_dir }}/{{ patch.name }}"
+    owner: "{{ service.user }}"
+    group: "{{ service.group }}"
+  loop: "{{ datagrid_patches | default([]) }}"
+  loop_control:
+    loop_var: patch

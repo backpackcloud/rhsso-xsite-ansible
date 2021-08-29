@@ -1,0 +1,7 @@
+---
+- hosts: datagrid
+  name: Install Data Grid
+
+  tasks:
+  - import_role:
+      name: datagrid

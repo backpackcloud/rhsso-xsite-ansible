@@ -1,0 +1,6 @@
+---
+- name: Install Data Grid
+  import_playbook: datagrid.yml
+
+- name: Install Data Grid
+  import_playbook: rhsso.yml
