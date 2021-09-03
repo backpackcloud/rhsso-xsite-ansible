@@ -8,8 +8,17 @@
   <jgroups>
       <!-- This is the Cross Data Center cluster configuration -->
       <stack name="global-cluster" extends="tcp">
-         <TCPPING initial_hosts="{{ datagrid_nodes | map('regex_replace', '^(.*)$', '\\1[7801]') | join(',') }}"
+          <TCPPING initial_hosts="{{ datagrid_nodes | map('regex_replace', '^(.*)$', '\\1[7801]') | join(',') }}"
                      stack.combine="REPLACE" stack.position="MPING"/>
+
+
+          <SYM_ENCRYPT keystore_name="{{ home }}/{{ xsite_ssl.name }}"
+                     keystore_type="{{ xsite_ssl.type }}"
+                     store_password="{{ xsite_ssl.store_password }}"
+                     key_password="{{ xsite_ssl.key_password }}"
+                     alias="{{ xsite_ssl.alias }}"
+                     stack.combine="INSERT_AFTER"
+                     stack.position="VERIFY_SUSPECT"/>
       </stack>
       <stack name="xsite" extends="tcp">
           <TCPPING initial_hosts="{{ datagrid_site_nodes | map('regex_replace', '^(.*)$', '\\1[7800]') | join(',') }}"
@@ -63,13 +72,13 @@
         <locking acquire-timeout="0"/>
       </distributed-cache-configuration>
 
-      <distributed-cache name="actionTokens" configuration="rhsso-async" />
-      <distributed-cache name="clientSessions" configuration="rhsso-async" />
-      <distributed-cache name="loginFailures" configuration="rhsso-local" />
-      <distributed-cache name="offlineClientSessions" configuration="rhsso-async" />
-      <distributed-cache name="offlineSessions" configuration="rhsso-async" />
-      <distributed-cache name="sessions" configuration="rhsso-async" />
-      <distributed-cache name="work" configuration="rhsso-async" />
+      <distributed-cache name="actionTokens" configuration="rhsso-{{ datagrid_caches.actionTokens.configuration }}" />
+      <distributed-cache name="clientSessions" configuration="rhsso-{{ datagrid_caches.clientSessions.configuration }}" />
+      <distributed-cache name="loginFailures" configuration="rhsso-{{ datagrid_caches.loginFailures.configuration }}" />
+      <distributed-cache name="offlineClientSessions" configuration="rhsso-{{ datagrid_caches.offlineClientSessions.configuration }}" />
+      <distributed-cache name="offlineSessions" configuration="rhsso-{{ datagrid_caches.offlineSessions.configuration }}" />
+      <distributed-cache name="sessions" configuration="rhsso-{{ datagrid_caches.sessions.configuration }}" />
+      <distributed-cache name="work" configuration="rhsso-{{ datagrid_caches.work.configuration }}" />
    </cache-container>
 
    <server xmlns="urn:infinispan:server:12.1">

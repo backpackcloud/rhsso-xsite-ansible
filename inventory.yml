@@ -16,6 +16,10 @@ all:
     rhsso_system_properties:
       events.http.url: https://elasticsearch.example.com/rhsso/events
 
+    rhsso_admin:
+      username: admin
+      password: supersecretpassword
+
   children:
 
     site_a:

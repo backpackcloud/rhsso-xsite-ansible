@@ -18,4 +18,3 @@
     state: started
     daemon_reload: yes
   tags: always
-

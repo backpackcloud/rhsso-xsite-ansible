@@ -50,14 +50,15 @@
 
 - name: Add keycloak users
   shell: >
-    {{ home }}/bin/add-user-keycloak.sh -u "{{ admin.username }}" -p "{{ admin.password }}"
+    {{ home }}/bin/add-user-keycloak.sh -u "{{ rhsso_admin.username }}" -p "{{ rhsso_admin.password }}"
   become: yes
   become_user: "{{ service.user }}"
   ignore_errors: true
   when: admin is defined
   tags: user
+  run_once: true
 
-- name: Copy deployments
+- name: Copy deployment file
   copy:
     src: "{{ deployment }}"
     dest: "{{ home }}/standalone/deployments/"
@@ -67,7 +68,7 @@
   loop_control:
     loop_var: deployment
 
-- name: Fetch patch file
+- name: Fetch deployment file
   get_url:
     url: "{{ deployment }}"
     dest: "{{ home }}/standalone/deployments/"

@@ -12,6 +12,34 @@
     home: "{{ install.files[0].path }}"
   when: home is not defined
 
+- name: Check if the JKS file is present
+  local_action:
+    module: ansible.builtin.stat
+    path: "{{ xsite_ssl.dir }}/{{ xsite_ssl.name }}"
+  register: jks_file
+
+- name: Generate JKS cert
+  local_action: >
+    ansible.builtin.command \
+    keytool \
+      -genseckey \
+      -keyalg {{ xsite_ssl.alg }} \
+      -alias {{ xsite_ssl.alias }} \
+      -storepass {{ xsite_ssl.store_password }} \
+      -keypass {{ xsite_ssl.key_password }} \
+      -keysize {{ xsite_ssl.size }} \
+      -storetype {{ xsite_ssl.type }} \
+      -keystore "{{ xsite_ssl.dir }}/{{ xsite_ssl.name }}"
+  run_once: true
+  when: not jks_file.stat.exists
+
+- name: Push JKS to server
+  copy:
+    src: "{{ xsite_ssl.dir }}/{{ xsite_ssl.name }}"
+    dest: "{{ home }}/{{ xsite_ssl.name }}"
+    owner: "{{ service.user }}"
+    group: "{{ service.group }}"
+
 - name: Add management user
   shell: >
     {{ home }}/bin/cli.sh user create "{{ item.key }}" -p "{{ item.value }}"

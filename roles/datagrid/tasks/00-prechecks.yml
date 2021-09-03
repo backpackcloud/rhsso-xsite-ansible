@@ -10,6 +10,24 @@
       jgroups_bind_address: "{{ jgroups_bind_address | default(ansible_ssh_host) }}"
       nodename: "{{ nodename | default(inventory_hostname) }}"
 
+- name: Compute cache parameters
+  set_fact:
+    datagrid_caches:
+      actionTokens:
+        configuration: "{{ cache_actionTokens_configuration | default('sync') }}"
+      clientSessions:
+        configuration: "{{ cache_clientSessions_configuration | default('sync') }}"
+      loginFailures:
+        configuration: "{{ cache_loginFailures_configuration | default('local') }}"
+      offlineClientSessions:
+        configuration: "{{ cache_offlineClientSessions_configuration | default('sync') }}"
+      offlineSessions:
+        configuration: "{{ cache_offlineSessions_configuration | default('sync') }}"
+      sessions:
+        configuration: "{{ cache_sessions_configuration | default('sync') }}"
+      work:
+        configuration: "{{ cache_work_configuration | default('sync') }}"
+
 - name: Initialize site hosts
   set_fact:
     datagrid_site_nodes: []

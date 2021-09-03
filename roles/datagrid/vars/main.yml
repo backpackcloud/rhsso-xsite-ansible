@@ -16,3 +16,12 @@ ports:
   - 11222/tcp  # cache endpoint
   - 7800/tcp   # site clustering
   - 7801/tcp   # cross site TCP
+
+xsite_ssl:
+  name: xsite.jks
+  alias: xsite
+  key_password: changeit
+  store_password: changeit
+  type: JCEKS
+  alg: Blowfish
+  size: 56
