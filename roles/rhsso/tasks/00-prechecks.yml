@@ -10,12 +10,26 @@
   set_fact:
     rhsso_site_nodes: []
     rhsso_nodes: []
+    datagrid_site_nodes: []
 
 - name: Compute site hosts
   set_fact:
     rhsso_site_nodes: "{{ rhsso_site_nodes + [ hostvars[item].rhsso_network.nodename ]  }}"
   when: "hostvars[item].site == site"
   loop: "{{ groups['rhsso'] }}"
+
+- name: Compute Data Grid site hosts
+  set_fact:
+    datagrid_site_nodes: "{{ datagrid_site_nodes + [ hostvars[item].nodename | default(hostvars[item].inventory_hostname) ]  }}"
+  when: "hostvars[item].site == site"
+  loop: "{{ groups['datagrid'] }}"
+
+- name: Compute Data Grid connection parameters
+  set_fact:
+    rhsso_datagrid_connection:
+      username: "{{ datagrid_rhsso_user }}"
+      password: "{{ datagrid_rhsso_password }}"
+      host: "{{ datagrid_site_nodes[0] }}"
 
 - name: Compute hosts
   set_fact:

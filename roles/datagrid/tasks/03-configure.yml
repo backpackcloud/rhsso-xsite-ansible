@@ -40,12 +40,17 @@
     owner: "{{ service.user }}"
     group: "{{ service.group }}"
 
-- name: Add management user
+- name: Add admin user
   shell: >
-    {{ home }}/bin/cli.sh user create "{{ item.key }}" -p "{{ item.value }}"
+    {{ home }}/bin/cli.sh user create admin -p "{{ datagrid_admin_password }}"
   become: yes
   become_user: "{{ service.user }}"
-  loop: "{{ console_users | dict2items }}"
+
+- name: Add RH-SSO user
+  shell: >
+    {{ home }}/bin/cli.sh user create "{{ datagrid_rhsso_user }}" -p "{{ datagrid_rhsso_password }}"
+  become: yes
+  become_user: "{{ service.user }}"
 
 - name: Create configuration file
   template:

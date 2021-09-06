@@ -48,14 +48,13 @@
     driver: "{{ item }}"
   loop: "{{ jdbc_drivers }}"
 
-- name: Add keycloak users
+- name: Add keycloak admin user
   shell: >
-    {{ home }}/bin/add-user-keycloak.sh -u "{{ rhsso_admin.username }}" -p "{{ rhsso_admin.password }}"
+    {{ home }}/bin/add-user-keycloak.sh -u "{{ rhsso_admin_user }}" -p "{{ rhsso_admin_password }}"
   become: yes
   become_user: "{{ service.user }}"
   ignore_errors: true
-  when: admin is defined
-  tags: user
+  when: rhsso_admin_user is defined
   run_once: true
 
 - name: Copy deployment file

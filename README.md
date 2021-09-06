@@ -85,8 +85,8 @@ rhsso_patches:
 
 The playbooks are organized using tags for each phase of the installation:
 
-- `system`: used for all operating system related tasks, such as creating users, installing packages and configuring 
-            firewall
+- `system`: used for all operating system related tasks, such as creating users, installing packages and configuring
+  firewall
 - `install`: used for the product installation tasks, like transferring files, unpacking and applying patches
 - `configure`: used for configuring the product after installation
 
@@ -105,21 +105,34 @@ RH-SSO. It uses TCPPING as the discovery mechanism together with the RELAY2 for 
 
 The expected variables to be supplied are:
 
-`console_users`: a map holding pairs of username/password to be added to the Data Grid. By a Data Grid convention, any
-                 user named `admin` will have admin privileges. This should be supplied via a vault file to avoid
-                 storing credentials in plain text.
+`datagrid_admin_password`: If provided, the `admin` user will be created.
 
 `bind_address`: which IP address to bind the Data Grid service. Defaults to `ansible_ssh_host` value.
 
 `jgroups_bind_address`: which IP address to bind the JGroups service for clustering. Defaults to ´ansible_ssh_host`
-                        value.
+value.
 
 `nodename`: the node name to use across the configuration files. It needs to be resolved for all nodes. Defaults to
-            `inventory_hostname`.
+`inventory_hostname`.
 
 `max_number_of_masters`: defines the maximum number of masters in the Data Grid topology. It's a good practice to allow
-                         all nodes to be masters, but this configuration is provided in case it needs to be adjusted.
-                         Defaults to the number of Data Grid nodes defined in the `datagrid` group.
+all nodes to be masters, but this configuration is provided in case it needs to be adjusted.
+Defaults to the number of Data Grid nodes defined in the `datagrid` group.
+
+`xsite_ssl`: defines the ssl parameters for the xsite replication, if the certificate is not found in the given
+location, it will be generated . Defaults to:
+
+```yaml
+xsite_ssl:
+  dir: .bin                 # the directory where the certificate is (or should be created)
+  name: xsite.jks           # the certificate file under the directory
+  alias: xsite              # the alias in the certificate to use
+  key_password: changeit    # the password for the key
+  store_password: changeit  # the password for the store
+  type: JCEKS               # the type of the certificate
+  alg: Blowfish             # only needed for generating the certificate
+  size: 56                  # only needed for generating the certificate
+```
 
 ## RH-SSO
 
@@ -138,7 +151,7 @@ value.
 `inventory_hostname`.
 
 `jvm`: a map with parameters for the JVM, where `heap` is the Heap size and `metaspace` is the Metaspace size. Defaults
-       to:
+to:
 
 ```yaml
 jvm:
@@ -146,36 +159,16 @@ jvm:
   metaspace: 256m
 ```
 
-`admin`: the credentials for the admin user. This should be supplied using vault to avoid storing credentials on plain
-         text files. It can be manually added later if not supplied in the inventory.
-
-Example:
-
-```yaml
-admin:
-  username: admin
-  password: super-strong-password-that-you-would-never-guess
-```
+`rhsso_admin_user` and `rhsso_admin_password`: the credentials for the admin user. This should be supplied using vault
+to avoid storing credentials on plain text files. It can be manually
+added later if not supplied in the inventory.
 
 `cache_owners`: the number of cache owners for the RH-SSO infrastructure. A good rule of thumb is to use around 3 owners
-                to not overload the network with the cache replication. Defaults to the number of nodes or 3, whichever
-                is lower.
+to not overload the network with the cache replication. Defaults to the number of nodes or 3, whichever
+is lower.
 
-`rhsso_datagrid_connection`: the connection to the Data Grid node. It's not necessary to provide all nodes as the whole cluster view is
-                             passed during the connection establishment. It expects a `host`, `username`, and `password` and can also be
-                             provided as part of a vault file.
-
-Example:
-
-```yaml
-rhsso_datagrid_connection:
-  host: rhdg-eu1.example.com
-  username: developer
-  password: developer
-```
-
-`rhsso_datasource`: defines the connection to the Database. It expects a `connection_url`, `username` and `password` and can
-                    also be provided as part of a vault file.
+`rhsso_datasource`: defines the connection to the Database. It expects a `connection_url`, `username` and `password` and
+can also be provided as part of a vault file.
 
 Example:
 

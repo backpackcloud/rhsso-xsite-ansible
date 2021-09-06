@@ -16,8 +16,11 @@ ports:
   - 11222/tcp  # cache endpoint
   - 7800/tcp   # site clustering
   - 7801/tcp   # cross site TCP
+  - 2157/tcp   # asym encryption
 
 xsite_ssl:
+  mode: asym
+  dir: .
   name: xsite.jks
   alias: xsite
   key_password: changeit

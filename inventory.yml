@@ -16,9 +16,13 @@ all:
     rhsso_system_properties:
       events.http.url: https://elasticsearch.example.com/rhsso/events
 
-    rhsso_admin:
-      username: admin
-      password: supersecretpassword
+    rhsso_admin_user: admin
+    rhsso_admin_password: superpassword
+
+    datagrid_rhsso_user: developer
+    datagrid_rhsso_password: developer
+
+    datagrid_admin_password: superpassword
 
   children:
 
@@ -29,11 +33,6 @@ all:
           connection_url: jdbc:mariadb://mariadba.example.com:3306/rhsso
           username: rhsso
           password: rhsso
-
-        rhsso_datagrid_connection:
-          host: rhdga1.example.com
-          username: developer
-          password: developer
 
       hosts:
         rhssoa1.example.com:
@@ -49,11 +48,6 @@ all:
           connection_url: jdbc:mariadb://mariadbb.example.com:3306/rhsso
           username: rhsso
           password: rhsso
-
-        rhsso_datagrid_connection:
-          host: rhdgb1.example.com
-          username: developer
-          password: developer
 
       hosts:
         rhssob1.example.com:
