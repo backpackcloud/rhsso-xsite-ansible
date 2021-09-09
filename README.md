@@ -134,6 +134,20 @@ xsite_ssl:
   size: 56                  # only needed for generating the certificate
 ```
 
+`cache_action_tokens_configuration`: sets which configuration to use for the cache `actionTokens` (defaults to `sync`)
+
+`cache_client_sessions_configuration`: sets which configuration to use for the cache `clientSessions` (defaults to `sync`)
+
+`cache_login_failures_configuration`: sets which configuration to use for the cache `loginFailures` (defaults to `local`)
+
+`cache_offline_client_sessions_configuration`: sets which configuration to use for the cache `offlineClientSessions` (defaults to `sync`)
+
+`cache_offline_sessions_configuration`: sets which configuration to use for the cache `offlineSessions` (defaults to `sync`)
+
+`cache_sessions_configuration`: sets which configuration to use for the cache `sessions` (defaults to `sync`)
+
+`cache_work_configuration`: sets which configuration to use for the cache `work` (defaults to `sync`)
+
 ## RH-SSO
 
 The role `rhsso` is responsible for the installation and configuration of Red Hat Single Sign-On using the previous
