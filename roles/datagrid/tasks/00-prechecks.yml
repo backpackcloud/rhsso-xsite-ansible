@@ -14,15 +14,15 @@
   set_fact:
     datagrid_caches:
       actionTokens:
-        configuration: "{{ cache_actionTokens_configuration | default('sync') }}"
+        configuration: "{{ cache_action_tokens_configuration | default('sync') }}"
       clientSessions:
-        configuration: "{{ cache_clientSessions_configuration | default('sync') }}"
+        configuration: "{{ cache_client_sessions_configuration | default('sync') }}"
       loginFailures:
-        configuration: "{{ cache_loginFailures_configuration | default('local') }}"
+        configuration: "{{ cache_login_failures_configuration | default('local') }}"
       offlineClientSessions:
-        configuration: "{{ cache_offlineClientSessions_configuration | default('sync') }}"
+        configuration: "{{ cache_offline_client_sessions_configuration | default('sync') }}"
       offlineSessions:
-        configuration: "{{ cache_offlineSessions_configuration | default('sync') }}"
+        configuration: "{{ cache_offline_sessions_configuration | default('sync') }}"
       sessions:
         configuration: "{{ cache_sessions_configuration | default('sync') }}"
       work:
