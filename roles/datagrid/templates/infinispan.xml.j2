@@ -11,9 +11,6 @@
       <TCPPING initial_hosts="{{ datagrid_nodes | map('regex_replace', '^(.*)$', '\\1[7801]') | join(',') }}"
                stack.combine="REPLACE" stack.position="MPING"/>
 
-      <TCPPING initial_hosts="{{ datagrid_nodes | map('regex_replace', '^(.*)$', '\\1[7801]') | join(',') }}"
-               stack.combine="REPLACE" stack.position="MPING"/>
-
       <SYM_ENCRYPT keystore_name="{{ home }}/{{ xsite_ssl.name }}"
                    keystore_type="{{ xsite_ssl.type }}"
                    store_password="{{ xsite_ssl.store_password }}"
