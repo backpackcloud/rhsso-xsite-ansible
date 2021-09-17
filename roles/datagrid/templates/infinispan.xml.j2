@@ -9,7 +9,10 @@
     <!-- This is the Cross Data Center cluster configuration -->
     <stack name="global-cluster" extends="tcp">
       <TCPPING initial_hosts="{{ datagrid_nodes | map('regex_replace', '^(.*)$', '\\1[7801]') | join(',') }}"
+               port_range="0"
                stack.combine="REPLACE" stack.position="MPING"/>
+
+      <FD_SOCK start_port="46000" port_range="0" />
 
       <SYM_ENCRYPT keystore_name="{{ home }}/{{ xsite_ssl.name }}"
                    keystore_type="{{ xsite_ssl.type }}"
@@ -23,7 +26,9 @@
     </stack>
     <stack name="xsite" extends="tcp">
       <TCPPING initial_hosts="{{ datagrid_site_nodes | map('regex_replace', '^(.*)$', '\\1[7800]') | join(',') }}"
+               port_range="0"
                stack.combine="REPLACE" stack.position="MPING"/>
+      <FD_SOCK start_port="45000" port_range="0" />
 
       <relay.RELAY2 xmlns="urn:org:jgroups"
                     site="{{ site }}"
@@ -43,7 +48,7 @@
     <security>
       <authorization/>
     </security>
-    <distributed-cache-configuration name="rhsso-sync" statistics="true" mode="SYNC">
+    <distributed-cache-configuration name="distributed-rhsso-sync" statistics="true" mode="SYNC">
       <locking acquire-timeout="0"/>
       <backups>
         {% for site_name in sites %}
@@ -56,7 +61,7 @@
       </backups>
     </distributed-cache-configuration>
 
-    <distributed-cache-configuration name="rhsso-async" statistics="true" mode="SYNC">
+    <distributed-cache-configuration name="distributed-rhsso-async" statistics="true" mode="SYNC">
       <locking acquire-timeout="0"/>
       <backups>
         {% for site_name in sites %}
@@ -69,19 +74,49 @@
       </backups>
     </distributed-cache-configuration>
 
-    <distributed-cache-configuration name="rhsso-local" statistics="true">
+    <distributed-cache-configuration name="distributed-rhsso-local" statistics="true">
       <locking acquire-timeout="0"/>
     </distributed-cache-configuration>
 
-    <distributed-cache name="actionTokens" configuration="rhsso-{{ datagrid_caches.actionTokens.configuration }}"/>
-    <distributed-cache name="clientSessions" configuration="rhsso-{{ datagrid_caches.clientSessions.configuration }}"/>
-    <distributed-cache name="loginFailures" configuration="rhsso-{{ datagrid_caches.loginFailures.configuration }}"/>
-    <distributed-cache name="offlineClientSessions"
-                       configuration="rhsso-{{ datagrid_caches.offlineClientSessions.configuration }}"/>
-    <distributed-cache name="offlineSessions"
-                       configuration="rhsso-{{ datagrid_caches.offlineSessions.configuration }}"/>
-    <distributed-cache name="sessions" configuration="rhsso-{{ datagrid_caches.sessions.configuration }}"/>
-    <distributed-cache name="work" configuration="rhsso-{{ datagrid_caches.work.configuration }}"/>
+    <replicated-cache-configuration name="replicated-rhsso-sync" statistics="true" mode="SYNC">
+      <locking acquire-timeout="0"/>
+      <backups>
+        {% for site_name in sites %}
+        {% if site_name != site %}
+        <backup site="{{ site_name }}" strategy="SYNC">
+          <take-offline min-wait="120000"/>
+        </backup>
+        {% endif %}
+        {% endfor %}
+      </backups>
+    </replicated-cache-configuration>
+
+    <replicated-cache-configuration name="replicated-rhsso-async" statistics="true" mode="SYNC">
+      <locking acquire-timeout="0"/>
+      <backups>
+        {% for site_name in sites %}
+        {% if site_name != site %}
+        <backup site="{{ site_name }}" strategy="ASYNC">
+          <take-offline min-wait="120000"/>
+        </backup>
+        {% endif %}
+        {% endfor %}
+      </backups>
+    </replicated-cache-configuration>
+
+    <replicated-cache-configuration name="replicated-rhsso-local" statistics="true">
+      <locking acquire-timeout="0"/>
+    </replicated-cache-configuration>
+
+    <{{ datagrid_caches.actionTokens.mode }}-cache name="actionTokens" configuration="{{ datagrid_caches.actionTokens.mode }}-rhsso-{{ datagrid_caches.actionTokens.configuration }}"/>
+    <{{ datagrid_caches.clientSessions.mode }}-cache name="clientSessions" configuration="{{ datagrid_caches.clientSessions.mode }}-rhsso-{{ datagrid_caches.clientSessions.configuration }}"/>
+    <{{ datagrid_caches.loginFailures.mode }}-cache name="loginFailures" configuration="{{ datagrid_caches.loginFailures.mode }}-rhsso-{{ datagrid_caches.loginFailures.configuration }}"/>
+    <{{ datagrid_caches.offlineClientSessions.mode }}-cache name="offlineClientSessions"
+    configuration="{{ datagrid_caches.offlineClientSessions.mode }}-rhsso-{{ datagrid_caches.offlineClientSessions.configuration }}"/>
+    <{{ datagrid_caches.offlineSessions.mode }}-cache name="offlineSessions"
+    configuration="{{ datagrid_caches.offlineSessions.mode }}-rhsso-{{ datagrid_caches.offlineSessions.configuration }}"/>
+    <{{ datagrid_caches.sessions.mode }}-cache name="sessions" configuration="{{ datagrid_caches.sessions.mode }}-rhsso-{{ datagrid_caches.sessions.configuration }}"/>
+    <{{ datagrid_caches.work.mode }}-cache name="work" configuration="{{ datagrid_caches.work.mode }}-rhsso-{{ datagrid_caches.work.configuration }}"/>
   </cache-container>
 
   <server xmlns="urn:infinispan:server:12.1">

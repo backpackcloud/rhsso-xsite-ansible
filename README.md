@@ -135,18 +135,25 @@ xsite_ssl:
 ```
 
 `cache_action_tokens_configuration`: sets which configuration to use for the cache `actionTokens` (defaults to `sync`)
+`cache_action_tokens_mode`: sets which mode to use for the cache `actionTokens` (defaults to `distributed`)
 
 `cache_client_sessions_configuration`: sets which configuration to use for the cache `clientSessions` (defaults to `sync`)
+`cache_client_sessions_mode`: sets which mode to use for the cache `clientSessions` (defaults to `distributed`)
 
 `cache_login_failures_configuration`: sets which configuration to use for the cache `loginFailures` (defaults to `local`)
+`cache_login_failures_mode`: sets which mode to use for the cache `loginFailures` (defaults to `distributed`)
 
 `cache_offline_client_sessions_configuration`: sets which configuration to use for the cache `offlineClientSessions` (defaults to `sync`)
+`cache_offline_client_sessions_mode`: sets which mode to use for the cache `offlineClientSessions` (defaults to `distributed`)
 
 `cache_offline_sessions_configuration`: sets which configuration to use for the cache `offlineSessions` (defaults to `sync`)
+`cache_offline_sessions_mode`: sets which mode to use for the cache `offlineSessions` (defaults to `distributed`)
 
 `cache_sessions_configuration`: sets which configuration to use for the cache `sessions` (defaults to `sync`)
+`cache_sessions_mode`: sets which mode to use for the cache `sessions` (defaults to `distributed`)
 
 `cache_work_configuration`: sets which configuration to use for the cache `work` (defaults to `sync`)
+`cache_work_mode`: sets which mode to use for the cache `work` (defaults to `replicated`)
 
 ## RH-SSO
 

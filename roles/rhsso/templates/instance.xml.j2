@@ -470,7 +470,7 @@
                     <transport type="TCP" socket-binding="jgroups-tcp"/>
                     <socket-discovery-protocol type="TCPPING" socket-bindings="{{ rhsso_site_nodes | join(' ') }}"/>
                     <protocol type="MERGE3"/>
-                    <protocol type="FD_SOCK"/>
+                    <socket-protocol type="FD_SOCK" socket-binding="jgroups-tcp-fd"/>
                     <protocol type="FD_ALL"/>
                     <protocol type="VERIFY_SUSPECT"/>
                     <protocol type="pbcast.NAKACK2"/>
