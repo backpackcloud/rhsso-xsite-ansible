@@ -3,7 +3,7 @@ Description={{ unit.description }}
 After=network.target
 
 [Service]
-ExecStart={{ home }}/bin/standalone.sh -c standalone-ha.xml
+ExecStart={{ home }}/bin/standalone.sh -c standalone-xsite.xml -b {{ rhsso_network.bind_address }} -bprivate {{ rhsso_network.jgroups_bind_address }}
 Type=simple
 Environment="JBOSS_HOME={{ home }}"
 User={{ service.user }}

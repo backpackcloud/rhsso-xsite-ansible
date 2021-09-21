@@ -12,13 +12,23 @@
     home: "{{ install.files[0].path }}"
   when: home is not defined
 
-- name: Create configuration file
+- name: Initialize configuration file
+  shell: "cp {{ home }}/standalone/configuration/standalone-ha.xml {{ home }}/standalone/configuration/standalone-xsite.xml"
+  become: yes
+  become_user: "{{ service.user }}"
+
+- name: Create configuration script file
   template:
-    src: instance.xml.j2
-    dest: "{{ home }}/standalone/configuration/standalone-ha.xml"
+    src: configure.cli.j2
+    dest: "{{ home }}/standalone/configuration/configure.cli"
     mode: "0644"
     owner: "{{ service.user }}"
     group: "{{ service.group }}"
+
+- name: Run configuration script file
+  shell: "{{ home }}/bin/jboss-cli.sh --file={{ home }}/standalone/configuration/configure.cli"
+  become: yes
+  become_user: "{{ service.user }}"
 
 - name: Create run.conf file
   template:

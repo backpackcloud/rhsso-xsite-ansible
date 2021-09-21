@@ -40,6 +40,31 @@
   set_fact:
     min_cache_owners: "{{ [3, rhsso_site_nodes | length] | min  }}"
 
+- name: Create configuration parameters
+  set_fact:
+    rhsso_spi_infinispan_properties:
+      remoteStoreSecurityEnabled: "true" # prevents the output to be "True"
+      remoteStoreSecurityRealm: default
+      remoteStoreSecurityServerName: infinispan
+      remoteStoreSecurityUsername: "{{ rhsso_datagrid_connection.username }}"
+      remoteStoreSecurityPassword: "{{ rhsso_datagrid_connection.password }}"
+    rhsso_remote_replicated_caches:
+      - work
+    rhsso_remote_distributed_caches:
+      - sessions
+      - clientSessions
+      - offlineClientSessions
+      - loginFailures
+      - actionTokens
+    rhsso_distributed_caches:
+      - offlineSessions
+      - sessions
+      - authenticationSessions
+      - clientSessions
+      - offlineClientSessions
+      - loginFailures
+      - actionTokens
+
 - name: Check if the unit file is present
   stat:
     path: "/etc/systemd/system/{{ unit.name }}.service"

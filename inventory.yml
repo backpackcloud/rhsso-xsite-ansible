@@ -30,8 +30,8 @@ all:
       vars:
         site: site_a
         rhsso_datasource:
-          connection_url: jdbc:mariadb://mariadba.example.com:3306/rhsso
-          username: rhsso
+          connection-url: jdbc:mariadb://mariadba.example.com:3306/rhsso
+          user-name: rhsso
           password: rhsso
 
       hosts:
@@ -45,8 +45,8 @@ all:
       vars:
         site: site_b
         rhsso_datasource:
-          connection_url: jdbc:mariadb://mariadbb.example.com:3306/rhsso
-          username: rhsso
+          connection-url: jdbc:mariadb://mariadbb.example.com:3306/rhsso
+          user-name: rhsso
           password: rhsso
 
       hosts:

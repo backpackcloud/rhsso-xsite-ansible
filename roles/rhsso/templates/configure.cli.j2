@@ -1,0 +1,134 @@
+embed-server --std-out=echo --server-config=standalone-xsite.xml
+batch
+
+###################################
+# System properties configuration #
+###################################
+
+/system-property=jboss.node.name:add(value={{ rhsso_network.nodename }})
+/system-property=jboss.site.name:add(value={{ site }})
+
+{% for name, value in rhsso_system_properties.items() %}
+/system-property={{ name }}:add(value="{{ value }}")
+{% endfor %}
+
+############################
+# Clustering configuration #
+############################
+
+/subsystem=jgroups/stack=tcpping:add
+/subsystem=jgroups/stack=tcpping/transport=TCP:add(socket-binding=jgroups-tcp)
+/subsystem=jgroups/stack=tcpping/protocol=TCPPING:add(socket-bindings=[{{ rhsso_site_nodes | join(',') }}])
+/subsystem=jgroups/stack=tcpping/protocol=MERGE3:add
+/subsystem=jgroups/stack=tcpping/protocol=FD_SOCK:add(type=FD_SOCK,socket-binding=jgroups-tcp-fd)
+/subsystem=jgroups/stack=tcpping/protocol=FD_ALL:add
+/subsystem=jgroups/stack=tcpping/protocol=VERIFY_SUSPECT:add
+/subsystem=jgroups/stack=tcpping/protocol=pbcast.NAKACK2:add
+/subsystem=jgroups/stack=tcpping/protocol=UNICAST3:add
+/subsystem=jgroups/stack=tcpping/protocol=pbcast.STABLE:add
+/subsystem=jgroups/stack=tcpping/protocol=pbcast.GMS:add
+/subsystem=jgroups/stack=tcpping/protocol=MFC:add
+/subsystem=jgroups/stack=tcpping/protocol=FRAG2:add
+
+/subsystem=jgroups/channel=ee:write-attribute(name=stack,value=tcpping)
+
+{% for host in rhsso_site_nodes %}
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding={{ host }}:add( \
+  host="{{ host }}", \
+  port=7600 \
+)
+{% endfor %}
+
+################################
+# Load balancing configuration #
+################################
+
+/socket-binding-group=standard-sockets/socket-binding=proxy-https:add(port=443)
+/subsystem=undertow/server=default-server/http-listener=default:write-attribute(name=proxy-address-forwarding,value=true)
+/subsystem=undertow/server=default-server/http-listener=default:write-attribute(name=redirect-socket,value=proxy-https)
+
+############################
+# Datasource Configuration #
+############################
+
+{% for driver in jdbc_drivers %}
+/subsystem=datasources/jdbc-driver={{ driver.name }}:add( \
+  driver-name={{ driver.name }}, \
+  driver-module-name={{ driver.module }} \
+)
+{% endfor %}
+
+{% for name, value in rhsso_datasource.items() %}
+/subsystem=datasources/data-source=KeycloakDS:write-attribute(name={{ name }},value={{ value }})
+{% endfor %}
+
+##############################
+# Remote cache configuration #
+##############################
+
+/subsystem=infinispan/cache-container=keycloak:write-attribute(name=module,value=org.keycloak.keycloak-model-infinispan)
+
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=remote-cache:add( \
+  host="{{ rhsso_datagrid_connection.host }}", \
+  port="11222" \
+)
+
+{% for name in rhsso_remote_replicated_caches %}
+/subsystem=infinispan/cache-container=keycloak/replicated-cache={{ name }}/store=remote:add( \
+  cache={{ name }}, \
+  remote-servers=[remote-cache], \
+  fetch-state=false, \
+  passivation=false, \
+  preload=false, \
+  purge=false, \
+  shared=true, \
+  properties={ \
+    rawValues=true, \
+    marshaller=org.keycloak.cluster.infinispan.KeycloakHotRodMarshallerFactory, \
+    infinispan.client.hotrod.sasl_mechanism=SCRAM-SHA-512, \
+    infinispan.client.hotrod.auth_username="{{ rhsso_datagrid_connection.username }}", \
+    infinispan.client.hotrod.auth_password="{{ rhsso_datagrid_connection.password }}", \
+    infinispan.client.hotrod.auth_realm=default, \
+    infinispan.client.hotrod.auth_server_name=infinispan \
+  } \
+)
+{% endfor %}
+
+{% for name in rhsso_remote_distributed_caches %}
+/subsystem=infinispan/cache-container=keycloak/distributed-cache={{ name }}/store=remote:add( \
+  cache={{ name }}, \
+  remote-servers=[remote-cache], \
+  fetch-state=false, \
+  passivation=false, \
+  preload=false, \
+  purge=false, \
+  shared=true, \
+  properties={ \
+    rawValues=true, \
+    marshaller=org.keycloak.cluster.infinispan.KeycloakHotRodMarshallerFactory, \
+    infinispan.client.hotrod.sasl_mechanism=SCRAM-SHA-512, \
+    infinispan.client.hotrod.auth_username="{{ rhsso_datagrid_connection.username }}", \
+    infinispan.client.hotrod.auth_password="{{ rhsso_datagrid_connection.password }}", \
+    infinispan.client.hotrod.auth_realm=default, \
+    infinispan.client.hotrod.auth_server_name=infinispan \
+  } \
+)
+{% endfor %}
+
+{% for name in rhsso_distributed_caches %}
+/subsystem=infinispan/cache-container=keycloak/distributed-cache={{ name }}:write-attribute( \
+  name=owners, \
+  value={{ cache_owners | default(min_cache_owners) }} \
+)
+{% endfor %}
+
+{% for name, value in rhsso_spi_infinispan_properties.items() %}
+/subsystem=keycloak-server/spi=connectionsInfinispan/provider=default:map-put( \
+  name=properties, \
+  key={{ name }}, \
+  value={{ value }} \
+)
+{% endfor %}
+
+run-batch
+quit

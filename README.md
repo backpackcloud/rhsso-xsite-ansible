@@ -188,21 +188,14 @@ added later if not supplied in the inventory.
 to not overload the network with the cache replication. Defaults to the number of nodes or 3, whichever
 is lower.
 
-`rhsso_datasource`: defines the connection to the Database. It expects a `connection_url`, `username` and `password` and
-can also be provided as part of a vault file.
+`rhsso_datasource`: defines the connection to the Database. It expects a `connection-url`, `user-name`, `password` and
+                    any other attribute that can be configured via `jboss-cli`.
 
 Example:
 
 ```yaml
 rhsso_datasource:
-  connection_url: jdbc:mariadb://mariadb-eu.example.com:3306/rhsso
-  username: rhsso
+  connection-url: jdbc:mariadb://mariadb-eu.example.com:3306/rhsso
+  user-name: rhsso
   password: rhsso 
 ```
-
-The playbook contains fixes for some known bugs present in earlier versions of RH-SSO. Those fixes don't impact in the
-product and can be disabled by skipping the tag `fix`. This is useful in order to test if the version used already fix
-the issues. The issues are described at:
-
-- https://access.redhat.com/solutions/4243861
-- https://access.redhat.com/solutions/4303601
