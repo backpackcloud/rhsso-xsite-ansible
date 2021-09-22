@@ -86,7 +86,7 @@ rhsso_patches:
 The playbooks are organized using tags for each phase of the installation:
 
 - `system`: used for all operating system related tasks, such as creating users, installing packages and configuring
-  firewall
+            firewall
 - `install`: used for the product installation tasks, like transferring files, unpacking and applying patches
 - `configure`: used for configuring the product after installation
 
