@@ -1,0 +1,47 @@
+---
+- name: Configure firewall
+  firewalld:
+    port: "{{ item }}"
+    permanent: true
+    immediate: true
+    state: enabled
+  loop:
+    - 80/tcp
+    - 443/tcp
+  tags:
+    - firewall
+
+- name: Ensure firewall is enabled
+  service:
+    name: firewalld
+    enabled: true
+    state: started
+  tags:
+    - firewall
+
+- name: Install haproxy package
+  package:
+    state: latest
+    name: haproxy
+
+- name: Create configuration file
+  template:
+    src: haproxy.cfg.j2
+    dest: "/etc/haproxy/haproxy.cfg"
+    owner: haproxy
+    group: haproxy
+
+- name: Copy certificate
+  copy:
+    src: "{{ haproxy_certs_path }}"
+    dest: "/etc/haproxy/certs.pem"
+    owner: haproxy
+    group: haproxy
+
+- name: Start haproxy
+  service:
+    name: haproxy
+    enabled: true
+    state: started
+    daemon_reload: yes
+  tags: always

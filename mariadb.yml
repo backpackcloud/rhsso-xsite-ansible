@@ -1,0 +1,7 @@
+---
+- hosts: mariadb
+  name: Install MariaDB
+
+  tasks:
+  - import_role:
+      name: mariadb

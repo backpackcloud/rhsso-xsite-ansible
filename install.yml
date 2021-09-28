@@ -1,6 +1,12 @@
 ---
+- name: Install MariaDB
+  import_playbook: mariadb.yml
+
 - name: Install Data Grid
   import_playbook: datagrid.yml
 
-- name: Install Data Grid
+- name: Install RH-SSO
   import_playbook: rhsso.yml
+
+- name: Install HA-Proxy
+  import_playbook: haproxy.yml

@@ -1,0 +1,54 @@
+---
+- name: Configure firewall
+  firewalld:
+    port: "{{ item }}"
+    permanent: true
+    immediate: true
+    state: enabled
+  loop:
+    - 3306/tcp
+    - 4567/tcp
+    - 4567/udp
+    - 4568/tcp
+    - 4444/tcp
+  tags:
+    - firewall
+
+- name: Ensure firewall is enabled
+  service:
+    name: firewalld
+    enabled: true
+    state: started
+  tags:
+    - firewall
+
+- name: Install mariadb packages
+  package:
+    state: latest
+    name: mariadb-server-galera
+
+- name: Create configuration file
+  template:
+    src: galera.cnf.j2
+    dest: /etc/my.cnf.d/galera.cnf
+
+- name: Create init sql file
+  template:
+    src: init.sql.j2
+    dest: /tmp/init.sql
+
+- name: Boostrap Galera Cluster
+  shell: galera_new_cluster
+  run_once: true
+
+- name: Start MariaDB
+  service:
+    name: mariadb
+    enabled: true
+    state: started
+    daemon_reload: yes
+  tags: always
+
+- name: Bootstrap MariaDB
+  shell: mysql --user=root < /tmp/init.sql
+  run_once: true

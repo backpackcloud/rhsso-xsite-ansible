@@ -5,61 +5,73 @@ all:
 
     datagrid_package_path: .bin/redhat-datagrid-8.2.1-server.zip
 
-    rhsso_package_path: .bin/rh-sso-7.4.0.zip
-    rhsso_patches:
-      - path: .bin/rh-sso-7.4.8-patch.zip
-        name: rh-sso-7.4.8-patch.zip
+    rhsso_package_path: .bin/rh-sso-7.5.0-server-dist.zip
 
-    rhsso_deployment_paths:
-      - .bin/keycloak-http-forwarder-0.1.0.jar
-
-    rhsso_system_properties:
-      events.http.url: https://elasticsearch.example.com/rhsso/events
-
-    rhsso_admin_user: admin
-    rhsso_admin_password: superpassword
+    rhsso_admin_user: ataxexe
+    rhsso_admin_password: backpackcloud
 
     datagrid_rhsso_user: developer
     datagrid_rhsso_password: developer
 
-    datagrid_admin_password: superpassword
+    datagrid_admin_password: redhat-123
+
+    cache_action_tokens_configuration: async
+    cache_client_sessions_configuration: async
+    cache_login_failures_configuration: local
+    cache_offline_client_sessions_configuration: async
+    cache_offline_sessions_configuration: async
+    cache_sessions_configuration: async
+    cache_work_configuration: sync
+
+    sso_domain: sso.backpackcloud.com
+
+    mariadb_root_password: root
+    mariadb_rhsso_database: rhsoo
+    mariadb_rhsso_username: rhsso
+    mariadb_rhsso_password: rhsso
+
+    haproxy_certs_path: .bin/certs.pem
 
   children:
 
     site_a:
       vars:
         site: site_a
-        rhsso_datasource:
-          connection-url: jdbc:mariadb://mariadba.example.com:3306/rhsso
-          user-name: rhsso
-          password: rhsso
 
       hosts:
-        rhssoa1.example.com:
-        rhssoa2.example.com:
+        rhssoa1.infra.backpackcloud.com:
+        rhssoa2.infra.backpackcloud.com:
 
-        rhdga1.example.com:
-        rhdga2.example.com:
+        rhdga1.infra.backpackcloud.com:
+        rhdga2.infra.backpackcloud.com:
+
+        mariadba.infra.backpackcloud.com:
 
     site_b:
       vars:
         site: site_b
-        rhsso_datasource:
-          connection-url: jdbc:mariadb://mariadbb.example.com:3306/rhsso
-          user-name: rhsso
-          password: rhsso
 
       hosts:
-        rhssob1.example.com:
-        rhssob2.example.com:
+        rhssob1.infra.backpackcloud.com:
+        rhssob2.infra.backpackcloud.com:
 
-        rhdgb1.example.com:
-        rhdgb2.example.com:
+        rhdgb1.infra.backpackcloud.com:
+        rhdgb2.infra.backpackcloud.com:
+
+        mariadbb.infra.backpackcloud.com:
 
     datagrid:
       hosts:
-        rhdg[a:b][1:2].example.com:
+        rhdg[a:b][1:2].infra.backpackcloud.com:
 
     rhsso:
       hosts:
-        rhsso[a:b][1:2].example.com:
+        rhsso[a:b][1:2].infra.backpackcloud.com:
+
+    mariadb:
+      hosts:
+        mariadb[a:b].infra.backpackcloud.com:
+
+    haproxy:
+      hosts:
+        haproxy.infra.backpackcloud.com:

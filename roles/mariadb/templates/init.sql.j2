@@ -1,0 +1,4 @@
+CREATE USER {{ mariadb_rhsso_username }} identified by '{{ mariadb_rhsso_password }}';
+CREATE DATABASE {{ mariadb_rhsso_database }};
+GRANT ALL PRIVILEGES ON {{ mariadb_rhsso_database }}.* TO {{ mariadb_rhsso_username }};
+FLUSH PRIVILEGES;

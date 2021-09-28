@@ -31,6 +31,16 @@
       password: "{{ datagrid_rhsso_password }}"
       host: "{{ datagrid_site_nodes[0] }}"
 
+- name: Compute MariaDB connection parameters
+  set_fact:
+    rhsso_datasource:
+      driver-name: mariadb
+      connection-url: "jdbc:mariadb://{{ hostvars[item].inventory_hostname }}:3306/{{ mariadb_rhsso_database }}"
+      user-name: "{{ mariadb_rhsso_username }}"
+      password: "{{ mariadb_rhsso_password }}"
+  when: "hostvars[item].site == site"
+  loop: "{{ groups['mariadb'] }}"
+
 - name: Compute hosts
   set_fact:
     rhsso_nodes: "{{ rhsso_nodes + [ hostvars[item].rhsso_network.nodename ] }}"
