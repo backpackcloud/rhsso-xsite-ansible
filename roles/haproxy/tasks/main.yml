@@ -33,7 +33,7 @@
 
 - name: Copy certificate
   copy:
-    src: "{{ haproxy_certs_path }}"
+    src: "{{ certs_dir | default('.') }}/{{ haproxy_certs }}"
     dest: "/etc/haproxy/certs.pem"
     owner: haproxy
     group: haproxy

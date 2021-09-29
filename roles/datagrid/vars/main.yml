@@ -16,8 +16,8 @@ ports:
   - 45000/tcp  # xsite FD_SOCK
 
 xsite_ssl:
-  dir: .
-  name: xsite.jks
+  dir: "{{ certs_dir | default('.') }}"
+  name: "{{ datagrid_certs | default('xsite.jks') }}"
   alias: xsite
   key_password: changeit
   store_password: changeit
