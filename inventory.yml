@@ -7,6 +7,10 @@ all:
 
     rhsso_package_path: .bin/rh-sso-7.5.0-server-dist.zip
 
+    certs_dir: .bin
+    haproxy_certs: certs.pem
+    datagrid_certs: xsite.jks
+
     rhsso_admin_user: ataxexe
     rhsso_admin_password: backpackcloud
 
@@ -30,7 +34,7 @@ all:
     mariadb_rhsso_username: rhsso
     mariadb_rhsso_password: rhsso
 
-    haproxy_certs_path: .bin/certs.pem
+    enable_access_log: true
 
   children:
 
