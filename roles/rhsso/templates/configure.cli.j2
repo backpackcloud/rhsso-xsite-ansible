@@ -130,5 +130,16 @@ batch
 )
 {% endfor %}
 
+############################
+# Access Log Configuration #
+############################
+
+{% if enable_access_log | default(false) %}
+/subsystem=undertow/server=default-server/http-listener=default:write-attribute(name=record-request-start-time,value=true)
+/subsystem=undertow/server=default-server/host=default-host/setting=access-log:add( \
+  pattern="%h %l %u %t \"%r\" %s %b \"%{i,Referer}\" \"%{i,User-Agent}\" Cookie: \"%{i,COOKIE}\" Set-Cookie: \"%{o,SET-COOKIE}\" SessionID: %S Thread: \"%I\" TimeTaken: %T" \
+)
+{% endif %}
+
 run-batch
 quit
